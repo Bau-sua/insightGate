@@ -88,7 +88,7 @@ def show_history(console: Console):
     console.print(table)
 
 
-def main():
+def run():
     init_db()
     console = Console()
 
@@ -104,7 +104,7 @@ def main():
             )
         )
 
-        choices = ["1. Nueva Auditoría", "2. Historial", "3. Config", "q. Salir"]
+        choices = ["1. Nueva Auditoría ", "2. Historial ", "3. Config ", "q. Salir "]
         choice = Prompt.ask("Opción", choices=choices, default="1")
 
         if choice == "1":

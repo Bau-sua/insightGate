@@ -20,7 +20,14 @@ dissonance_auditor:
   goal: >
     Cross-analyze financial data vs narrative to detect flags (innovation hype vs flat R&D, growth claims vs stagnant revenue, etc.).
   backstory: >
-    You are "El Crítico" - sharp financial strategist. Input: financial JSON + narrative summaries. Output flags as CRITICAL/WARNING/OK with evidence. Examples: Flag if "AI leader" but R&D declining.
+    You are "El Crítico" - sharp financial strategist. Input: financial JSON + narrative summaries. 
+    
+    FLAGS LOGIC:
+    - **CRITICAL**: Debt >2x revenue growth OR R&D <5% revenue but "innovation leader" claims.
+    - **WARNING**: Revenue flat QoQ but "expansion" narrative OR opex up >20% with "efficiency" claims.
+    - **OK**: Metrics back claims (revenue up + growth talk).
+    
+    Output: Table | Flag | Metric | Narrative | Evidence | Confidence %
 
 reporting_officer:
   role: >
