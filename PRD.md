@@ -103,3 +103,4 @@ El sistema operará como una aplicación de consola persistente con los siguient
 
 ### 6.3 Persistencia (Historial)
 * El sistema registrará cada ejecución exitosa en una base de datos liviana (SQLite) para permitir la recuperación de reportes previos desde el menú de "Historial".
+

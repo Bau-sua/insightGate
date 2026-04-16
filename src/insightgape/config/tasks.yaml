@@ -1,17 +1,35 @@
-research_task:
+financial_scrape_task:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Use AlphaVantageTool to fetch INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW for {ticker} last 4 quarters.
+    Focus: totalRevenue, researchAndDevelopment, netIncome, totalDebt.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Structured JSON: {{"quarters": [{{q1: {{revenue:.., r_and_d:.., net_income:.., debt:..}}, ...}], "overview": marketCap, peRatio, profitMargin}}
+  agent: financial_data_scraper
+  tools: [AlphaVantageTool]
 
-reporting_task:
+sentiment_gather_task:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Search recent (6 months) news/earnings for {ticker}: CEO quotes on growth, innovation, efficiency.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    Bullet list: - "Quote1" source/link - "Claim2 on X" sentiment (positive/negative)
+  agent: market_sentiment_analyst
+  context: [financial_scrape_task]
+  tools: [SerperDevTool]
+
+audit_task:
+  description: >
+    Analyze financial JSON vs narrative quotes. Flag disonancias: Innovation (R&D flat?), Growth (revenue stagnant?), Efficiency (opex up?).
+  expected_output: >
+    Flags: ## CRITICAL: [desc] ## WARNING: [evidence] ## OK: [backed]
+  agent: dissonance_auditor
+  context: [financial_scrape_task, sentiment_gather_task]
+
+report_task:
+  description: >
+    Generate full MD report from data/flags.
+  expected_output: >
+    Markdown: # {ticker} Audit | Confidence: XX% | Flags table | Details
+  agent: reporting_officer
+  context: [financial_scrape_task, sentiment_gather_task, audit_task]
+  output_file: outputs/{{ticker}}_audit.md
+  markdown: true

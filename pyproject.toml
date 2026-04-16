@@ -1,20 +1,27 @@
 [project]
-name = "insigthgape"
+name = "insightgape"
 version = "0.1.0"
-description = "insigthGape using crewAI"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+description = "InsightGape: Black Box Auditor - Financial Intelligence Agent (CrewAI multi-agent system for corporate narrative auditing)"
+authors = [{ name = "InsightGape Team", email = "insights@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai[tools]==1.14.1"
+    "crewai[tools]==1.14.1",
+    "rich",
+    "python-dotenv",
+    "alpha_vantage",
+    "pytest",
+    "weasyprint",
+    "requests",
+    "beautifulsoup4"
 ]
 
 [project.scripts]
-insigthgape = "insigthgape.main:run"
-run_crew = "insigthgape.main:run"
-train = "insigthgape.main:train"
-replay = "insigthgape.main:replay"
-test = "insigthgape.main:test"
-run_with_trigger = "insigthgape.main:run_with_trigger"
+insightgape = "insightgape.main:run"
+run_crew = "insightgape.main:run"
+train = "insightgape.main:train"
+replay = "insightgape.main:replay"
+test = "insightgape.main:test"
+run_with_trigger = "insightgape.main:run_with_trigger"
 
 [build-system]
 requires = ["hatchling"]
