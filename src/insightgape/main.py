@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+"""InsightGape CLI."""
+
 import sys
-import os
 import warnings
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,7 @@ from rich.live import Live
 from rich.status import Status
 from rich.text import Text
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
@@ -45,21 +47,27 @@ def run_audit(ticker: str, console: Console):
     inputs = {"ticker": ticker.upper()}
     status = Status(f"Running Black Box Audit for {ticker}...", spinner="dots")
     with Live(status, refresh_per_second=10):
-        result = InsightGapeCrew().audit_crew().kickoff(inputs=inputs, verbose=2)
+        crew = InsightGapeCrew()
+        result = crew.audit_crew().kickoff(inputs=inputs)
 
-    # Assume report_task outputs to fixed path or extract
+    # Dynamic MD from report_task output
     date_str = datetime.now().strftime("%Y-%m-%d")
     md_path = OUTPUTS_DIR / f"{date_str}_{ticker}_audit.md"
     pdf_path = md_path.with_suffix(".pdf")
 
-    # Generate PDF
+    # Write report from last task raw
+    report_content = result.tasks_output[-1].raw
+    with open(md_path, "w") as f:
+        f.write(report_content)
+
+    # PDF
     try:
         HTML(str(md_path)).write_pdf(str(pdf_path))
-        console.print(f"[green]✅ PDF generated: {pdf_path}")
+        console.print(f"[green]✅ MD/PDF: {pdf_path}")
     except Exception as e:
-        console.print(f"[yellow]⚠️ PDF failed: {e}")
+        console.print(f"[yellow]⚠️ PDF fail: {e}")
 
-    # Save to DB
+    # DB log
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
     cur.execute(
@@ -68,7 +76,7 @@ def run_audit(ticker: str, console: Console):
     )
     conn.commit()
     conn.close()
-    console.print(f"[green]Audit logged in DB!")
+    console.print(f"[green]✅ Logged DB!")
 
 
 def show_history(console: Console):
@@ -77,60 +85,48 @@ def show_history(console: Console):
     cur.execute("SELECT * FROM audits ORDER BY date DESC LIMIT 10")
     rows = cur.fetchall()
     conn.close()
-
     if not rows:
-        console.print("[yellow]No audits yet!")
+        console.print("[yellow]No audits!")
         return
-
-    table = Table("ID", "Ticker", "Date", "MD Path", "PDF Path", title="Audit History")
+    table = Table("ID", "Ticker", "Date", "MD", "PDF", title="History")
     for row in rows:
-        table.add_row(*[str(x) for x in row])
+        table.add_row(*map(str, row))
     console.print(table)
 
 
 def run():
     init_db()
     console = Console()
-
     while True:
         console.clear()
         console.print(
-            Panel.fit(
-                Text(
-                    "🕵️‍♂️  InsightGape Auditor\nBlack Box Corporate Narrative Audit",
-                    style="bold cyan",
-                ),
-                style="bold blue",
-            )
+            Panel(Text("🕵️‍♂️ InsightGape Auditor", style="bold cyan"), style="blue")
         )
-
-        choices = ["1. Nueva Auditoría ", "2. Historial ", "3. Config ", "q. Salir "]
-        choice = Prompt.ask("Opción", choices=choices, default="1")
-
-        if choice == "1":
-            ticker = Prompt.ask("Ticker (ej. TSLA)")
-            if Confirm.ask("Ejecutar audit?"):
-                run_audit(ticker, console)
-                Prompt.ask("Presiona Enter para continuar")
-        elif choice == "2":
-            show_history(console)
-            Prompt.ask("Presiona Enter")
-        elif choice == "3":
-            console.print(
-                f"[green]✅ ALPHA_VANTAGE_KEY: {'OK' if os.getenv('ALPHA_VANTAGE_KEY') else 'Missing'}"
-            )
-            console.print(
-                f"[green]✅ SERPER_API_KEY: {'OK' if os.getenv('SERPER_API_KEY') else 'Missing'}"
-            )
-            Prompt.ask("Presiona Enter")
-        else:
+        choice_key = Prompt.ask(
+            "Opción [1/2/3/q]", choices=["1", "2", "3", "q"], default="1"
+        )
+        if choice_key == "q":
             break
+        elif choice_key == "1":
+            ticker = Prompt.ask("Ticker (TSLA)")
+            if Confirm.ask("Audit?"):
+                run_audit(ticker, console)
+                Prompt.ask("Enter...")
+        elif choice_key == "2":
+            show_history(console)
+            Prompt.ask("Enter...")
+        elif choice_key == "3":
+            console.print(
+                f"ALPHA_VANTAGE: {'✅' if os.getenv('ALPHA_VANTAGE_KEY') else '❌'}"
+            )
+            console.print(f"SERPER: {'✅' if os.getenv('SERPER_API_KEY') else '❌'}")
+            Prompt.ask("Enter...")
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "demo":
         init_db()
-        console = Console()
-        run_audit("TSLA", console)
+        Console().print("Demo TSLA...")
+        run_audit("TSLA", Console())
     else:
-        main()
+        run()

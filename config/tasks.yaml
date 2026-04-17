@@ -1,0 +1,16 @@
+financial_scrape_task:
+  description: "Use AlphaVantageTool para INCOME_STATEMENT, BALANCE_SHEET, CASH_FLOW de {ticker} últimos 4 quarters. Focus: totalRevenue, researchAndDevelopment, netIncome, totalDebt."
+  expected_output: "JSON: {{ quarters: [{q1: {revenue, r&d, ...}}, ...], overview: {trends} }}"
+
+sentiment_gather_task:
+  description: "Search recent (6 months) news/earnings {ticker}: CEO quotes growth/innovation/efficiency."
+  expected_output: "Quotes array: [{quote, source, sentiment}]"
+
+audit_task:
+  description: "Analyze financial JSON vs quotes. Flag: Innovation (R&D flat?), Growth (revenue stagnant?), Efficiency (opex up?)."
+  expected_output: "Tabla MD: | Flag | Metric | Narrative | Evidence | Confidence % |"
+
+report_task:
+  description: "Full MD report de data/flags."
+  expected_output: "# {ticker} Audit | Confidence % | Flags table | Summary"
+  markdown: true

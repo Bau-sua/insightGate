@@ -5,7 +5,7 @@ financial_scrape_task:
   expected_output: >
     Structured JSON: {{"quarters": [{{q1: {{revenue:.., r_and_d:.., net_income:.., debt:..}}, ...}], "overview": marketCap, peRatio, profitMargin}}
   agent: financial_data_scraper
-  tools: [AlphaVantageTool]
+
 
 sentiment_gather_task:
   description: >
@@ -14,7 +14,7 @@ sentiment_gather_task:
     Bullet list: - "Quote1" source/link - "Claim2 on X" sentiment (positive/negative)
   agent: market_sentiment_analyst
   context: [financial_scrape_task]
-  tools: [SerperDevTool]
+
 
 audit_task:
   description: >
@@ -31,5 +31,5 @@ report_task:
     Markdown: # {ticker} Audit | Confidence: XX% | Flags table | Details
   agent: reporting_officer
   context: [financial_scrape_task, sentiment_gather_task, audit_task]
-  output_file: outputs/{{ticker}}_audit.md
+  output_file: outputs/audit.md
   markdown: true

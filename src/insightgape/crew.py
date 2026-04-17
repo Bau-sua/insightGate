@@ -7,9 +7,7 @@ from insightgape.tools import AlphaVantageTool
 
 @CrewBase
 class InsightGapeCrew:
-    """
-    InsightGape Black Box Auditor Crew.
-    """
+    """InsightGape Black Box Auditor Crew."""
 
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -77,20 +75,16 @@ class InsightGapeCrew:
                 self.sentiment_gather_task(),
                 self.audit_task(),
             ],
-            output_file="outputs/{{ticker}}_audit.md",
             markdown=True,
         )
 
     @crew
     def audit_crew(self) -> Crew:
-        """
-        Creates the InsightGape Audit Crew.
-        """
+        """Creates the InsightGape Audit Crew."""
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=2,
-            memory=True,
-            cache=True,
+            memory=False,  # Disable OpenAI 403 embeddings\n            cache=True,
+            tracing=True,
         )
