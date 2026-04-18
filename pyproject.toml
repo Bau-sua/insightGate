@@ -1,5 +1,9 @@
 [project]
-name = "insightgape"
+name = \"insightgape\"
+
+[tool.crewai]
+type = \"crew\"
+crew = \"insightgape.crew:InsightGapeCrew.audit_crew\"
 version = "0.1.0"
 description = "InsightGape: Black Box Auditor - Financial Intelligence Agent (CrewAI multi-agent system for corporate narrative auditing)"
 authors = [{ name = "InsightGape Team", email = "insights@example.com" }]
@@ -8,7 +12,7 @@ dependencies = [
     "crewai[tools]==1.14.1",
     "rich",
     "python-dotenv",
-    "alpha_vantage",
+    "alpha-vantage",
     "pytest",
     "weasyprint",
     "requests",
@@ -22,8 +26,7 @@ insightgape = "insightgape.main:run"
 run_crew = "insightgape.main:run"
 train = "insightgape.main:train"
 replay = "insightgape.main:replay"
-test = "insightgape.main:test"
-run_with_trigger = "insightgape.main:run_with_trigger"
+# Removed unused scripts for crewai test
 
 [build-system]
 requires = ["hatchling"]

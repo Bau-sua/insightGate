@@ -29,13 +29,13 @@ class AlphaVantageTool(BaseTool):
 
         fd = FundamentalData(key=api_key, output_format="pandas")
         data, meta = (
-            fd.get_income_statement(quarterly=True)
+            fd.get_income_statement(symbol=ticker, quarterly=True)
             if function == "INCOME_STATEMENT"
-            else fd.get_balance_sheet(quarterly=True)
+            else fd.get_balance_sheet(symbol=ticker, quarterly=True)
             if function == "BALANCE_SHEET"
-            else fd.get_cash_flow(quarterly=True)
+            else fd.get_cash_flow(symbol=ticker, quarterly=True)
             if function == "CASH_FLOW"
-            else fd.get_company_overview()
+            else fd.get_company_overview(symbol=ticker)
         )
 
         if function != "OVERVIEW":
